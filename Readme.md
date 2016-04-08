@@ -1,8 +1,49 @@
 # Simple rsync container based on alpine
 
-A simple rsync Docker image to easily rsync data within Docker volumes
+A simple rsync server/client Docker image to easily rsync data within Docker volumes
 
-## Usage
+## Simple Usage
 
-    $ docker run -it --rm -v blobstorage:/data/ eeacms/rsync \
-             rsync user@remote.server.domain.or.ip:/var/local/blobs/ /data/
+Get files from remote server within a `docker volume`:
+
+    $ docker run --rm -v blobstorage:/data/ eeacms/rsync \
+                 rsync -avz user@remote.server.domain.or.ip:/var/local/blobs/ /data/
+
+Get files from `remote server` to a `data container`:
+
+    $ docker run -d --name data -v /data busybox
+    $ docker run --rm --volumes-from=data eeacms/rsync \
+             rsync -avz user@remote.server.domain.or.ip:/var/local/blobs/ /data/
+
+## Advanced Usage
+
+### Client setup
+
+Start client to sync every night at 3AM:
+
+    $ docker run --name=rsync_client -v client_vol_to_sync:/data \
+                 -e CRON_TASK="0 3 * * * rsync -e 'ssh -p 2222 -o StrictHostKeyChecking=no' -avz root@foo.bar.com:/data/ /data/" \
+             eeacms/rsync client
+
+Copy the client SSH public key printed found in console
+
+### Server setup
+
+Start server on `foo.bar.com`
+
+    # docker run --name=rsync_server -d -p 2222:22 -v server_vol_to_sync:/data \
+                 -e SSH_AUTH_KEY="<SSH KEY FROM rsync_client>" \
+             eeacms/rsync server
+
+### Verify that it works
+
+Add `test` file on server:
+
+    $ docker exec -it rsync_server sh
+      $ touch /data/test
+
+Bring the `file` on client:
+
+    $ docker exec -it rsync_client sh
+      $ rsync -e 'ssh -p 2222 -o StrictHostKeyChecking=no' -avz root@foo.bar.com:/data/ /data/
+      $ ls -l /data/
