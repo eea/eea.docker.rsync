@@ -13,10 +13,16 @@ if [ ! -z "$SSH_AUTH_KEY" ]; then
 fi
 
 # Provide CRON_TASK via environment variable
-if [ ! -z "$CRON_TASK" ]; then
-  echo "$CRON_TASK" > /etc/crontabs/root
-  echo "root" > /etc/crontabs/cron.update
-fi
+echo '' > /etc/crontabs/root
+for item in `env`; do
+   case "$item" in
+       CRON_TASK*)
+            ENVVAR=`echo $item | cut -d \= -f 1`
+            printenv $ENVVAR >> /etc/crontabs/root
+            echo "root" > /etc/crontabs/cron.update
+            ;;
+   esac
+done
 
 # Generate host SSH keys
 if [ ! -e /etc/ssh/ssh_host_rsa_key.pub ]; then

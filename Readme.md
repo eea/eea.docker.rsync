@@ -19,10 +19,11 @@ Get files from `remote server` to a `data container`:
 
 ### Client setup
 
-Start client to sync every night at 3AM:
+Start client to pack and sync every night:
 
     $ docker run --name=rsync_client -v client_vol_to_sync:/data \
-                 -e CRON_TASK="0 3 * * * rsync -e 'ssh -p 2222 -o StrictHostKeyChecking=no' -avz root@foo.bar.com:/data/ /data/" \
+                 -e CRON_TASK_1="0 1 * * * /data/pack-db.sh" \
+                 -e CRON_TASK_2="0 3 * * * rsync -e 'ssh -p 2222 -o StrictHostKeyChecking=no' -avz root@foo.bar.com:/data/ /data/" \
              eeacms/rsync client
 
 Copy the client SSH public key printed found in console
