@@ -7,7 +7,7 @@ A simple rsync server/client Docker image to easily rsync data within Docker vol
 Get files from remote server within a `docker volume`:
 
     $ docker run --rm -v blobstorage:/data/ eeacms/rsync \
-                 rsync -avz user@remote.server.domain.or.ip:/var/local/blobs/ /data/
+             rsync -avzx --numeric-ids user@remote.server.domain.or.ip:/var/local/blobs/ /data/
 
 Get files from `remote server` to a `data container`:
 
@@ -23,7 +23,7 @@ Start client to pack and sync every night:
 
     $ docker run --name=rsync_client -v client_vol_to_sync:/data \
                  -e CRON_TASK_1="0 1 * * * /data/pack-db.sh" \
-                 -e CRON_TASK_2="0 3 * * * rsync -e 'ssh -p 2222 -o StrictHostKeyChecking=no' -avz root@foo.bar.com:/data/ /data/" \
+                 -e CRON_TASK_2="0 3 * * * rsync -e 'ssh -p 2222' -aqx --numeric-ids root@foo.bar.com:/data/ /data/" \
              eeacms/rsync client
 
 Copy the client SSH public key printed found in console
@@ -33,7 +33,8 @@ Copy the client SSH public key printed found in console
 Start server on `foo.bar.com`
 
     # docker run --name=rsync_server -d -p 2222:22 -v server_vol_to_sync:/data \
-                 -e SSH_AUTH_KEY="<SSH KEY FROM rsync_client>" \
+                 -e SSH_AUTH_KEY_1="<SSH KEY FROM rsync_client>" \
+                 -e SSH_AUTH_KEY_n="<SSH KEY FROM rsync_client_n>" \
              eeacms/rsync server
 
 ### Verify that it works
@@ -46,5 +47,5 @@ Add `test` file on server:
 Bring the `file` on client:
 
     $ docker exec -it rsync_client sh
-      $ rsync -e 'ssh -p 2222 -o StrictHostKeyChecking=no' -avz root@foo.bar.com:/data/ /data/
+      $ rsync -e 'ssh -p 2222' -avz root@foo.bar.com:/data/ /data/
       $ ls -l /data/
