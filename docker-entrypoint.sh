@@ -9,10 +9,10 @@ mkdir -p /root/.ssh
 chmod go-rwx /root/.ssh/authorized_keys
 sed -i "s/#PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
 
-# Provide SSH_AUTHORIZED_KEY_* via environment variable
+# Provide SSH_AUTH_KEY_* via environment variable
 for item in `env`; do
    case "$item" in
-       SSH_AUTHORIZED_KEY*)
+       SSH_AUTH_KEY*)
             ENVVAR=`echo $item | cut -d \= -f 1`
             printenv $ENVVAR >> /root/.ssh/authorized_keys
             ;;
