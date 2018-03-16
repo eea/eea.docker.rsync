@@ -49,3 +49,34 @@ Bring the `file` on client:
     $ docker exec -it rsync_client sh
       $ rsync -e 'ssh -p 2222' -avz root@foo.bar.com:/data/ /data/
       $ ls -l /data/
+      
+### Rsync data between containers in Rancher
+
+0. Request TCP access to port 2222 to an accessible server of environment of the new installation from the source container host server.
+
+1. Start **rsync client** on host from where do you want to migrate data (ex. production). 
+
+    Infrastructures -> Hosts ->  Add Container
+    * Select image: eeacms/rsync
+    * Command: sh
+    * Volumes -> Volumes from: Select source container
+
+2. Open logs from container, copy the ssh key from the message
+
+2. Start **rsync server** on host from where do you want to migrate data (ex. devel). The destination container should be temporarily moved to an accessible server ( if it's not on one ) .
+
+    Infrastructures -> Hosts ->  Add Container
+    * Select image: eeacms/rsync
+    * Port map -> +(add) : 2222:22
+    * Command: server
+    * Add environment variable: SSH_AUTH_KEY="<SSH-KEY-FROM-R-CLIENT-ABOVE>"
+    * Volumes -> Volumes from: Select destination container
+
+
+3. Within **rsync client** container from step 1 run:
+
+  ```
+    $ rsync -e 'ssh -p 2222' -avz <SOURCE_DUMP_LOCATION> root@<TARGET_HOST_IP_ON_DEVEL>:<DESTINATION_LOCATION>
+  ```
+  
+4. The rsync servers can be deleted, and the destination container can be moved back ( if needed )
