@@ -8,6 +8,7 @@ mkdir -p /root/.ssh
 > /root/.ssh/authorized_keys
 chmod go-rwx /root/.ssh/authorized_keys
 sed -i "s/#PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
+sed -i 's/root:!/root:*/' /etc/shadow
 
 # Provide SSH_AUTH_KEY_* via environment variable
 for item in `env`; do
