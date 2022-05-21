@@ -23,14 +23,19 @@ for item in `env`; do
    case "$item" in
        SSH_AUTH_KEY*)
             ENVVAR=`echo $item | cut -d \= -f 1`
-            echo "Adding key $ENVVAR"
+            echo "Adding key `printenv $ENVVAR`"
             printenv $ENVVAR >> /root/.ssh/authorized_keys
             ;;
    esac
 done
 
+# Remove any duplicates
+echo "Removing duplicate keys if present"
+sort -u /root/.ssh/authorized_keys > /tmp/u
+mv -f /tmp/u /root/.ssh/authorized_keys
+
 # Store the keys if possible
-if [ -d /ssh_keys/ ] ; then
+if [ -d /ssh_keys ] ; then
   # Using updated authorization keys
   echo "Saving keys for the future"
   cp -u /root/.ssh/authorized_keys /ssh_keys/
