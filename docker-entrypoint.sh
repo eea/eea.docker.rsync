@@ -16,7 +16,6 @@ else
   echo "No existing authorized keys, starting with empty file"
   > /root/.ssh/authorized_keys
 fi
-chmod go-rwx /root/.ssh/authorized_keys
 
 # Provide SSH_AUTH_KEY_* via environment variable
 for item in `env`; do
@@ -33,6 +32,7 @@ done
 echo "Removing duplicate keys if present"
 sort -u /root/.ssh/authorized_keys > /tmp/u
 mv -f /tmp/u /root/.ssh/authorized_keys
+chmod go-rwx /root/.ssh/authorized_keys
 
 # Store the keys if possible
 if [ -d /ssh_keys ] ; then
