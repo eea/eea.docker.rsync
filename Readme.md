@@ -28,6 +28,15 @@ Start client to pack and sync every night:
 
 Copy the client SSH public key printed found in console
 
+or use a second volume to store client ssh keys between restarts, not re-created evvery time
+
+    $ docker run --name=rsync_client -v client_vol_to_sync:/data \
+                 -v storage_of_client_ssh_keys:/ssh_keys \
+                 -e CRON_TASK_1="0 1 * * * /data/pack-db.sh" \
+                 -e CRON_TASK_2="0 3 * * * rsync -e 'ssh -p 2222' -aqx --numeric-ids root@foo.bar.com:/data/ /data/" \
+             eeacms/rsync client
+
+
 ### Server setup
 
 Start server on `foo.bar.com`
@@ -36,6 +45,16 @@ Start server on `foo.bar.com`
                  -e SSH_AUTH_KEY_1="<SSH KEY FROM rsync_client>" \
                  -e SSH_AUTH_KEY_n="<SSH KEY FROM rsync_client_n>" \
              eeacms/rsync server
+
+or use a second volume to store client ssh keys between restarts, no need to upload keys every time
+
+    # docker run --name=rsync_server -d -p 2222:22 -v server_vol_to_sync:/data \
+                 -v storage_of_client_ssh_keys:/ssh_keys \
+                 -e SSH_AUTH_KEY_1="<SSH KEY FROM rsync_client>" \
+                 -e SSH_AUTH_KEY_n="<SSH KEY FROM rsync_client_n>" \
+             eeacms/rsync server
+
+The keys in the "SSH_AUTH_KEY_n" is appended to the keys in the file "authrozed_keys" in the volume. The resulting file is then used in the container.
 
 ### Verify that it works
 
