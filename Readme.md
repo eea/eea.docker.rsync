@@ -28,6 +28,15 @@ Start client to pack and sync every night:
 
 Copy the client SSH public key printed found in console
 
+### SSH key persistence
+
+To use the same generated keys on docker container re-creation, you need to persist the key directory ( `/root/.ssh` ) in a Docker volume. On first start the keys will be created, and then, on all subsequent starts they will be re-used.
+
+For example, you can use a volume called `ssh-key` like this:
+
+    $ docker run --name=rsync_client -v ssh-key:/root/.ssh -v client_vol_to_sync:/data
+             eeacms/rsync client
+
 ### Server setup
 
 Start server on `foo.bar.com`
