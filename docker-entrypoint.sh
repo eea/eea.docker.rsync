@@ -10,6 +10,18 @@ chmod go-rwx /root/.ssh/authorized_keys
 sed -i "s/.*PasswordAuthentication .*/PasswordAuthentication no/g" /etc/ssh/sshd_config
 sed -i 's/root:!/root:*/' /etc/shadow
 
+if [ "$RSYNC_UID" != "" ] && [ "$RSYNC_GID" != "" ]; then
+    # UID and GID provided, create user
+    echo "UID and GID provided: $RSYNC_UID and $RSYNC_GID. Creating the user"
+    echo "rsyncuser:x:$RSYNC_UID:$RSYNC_GID::/home/rsyncuser:/bin/sh" >> /etc/passwd
+    echo "users:x:$RSYNC_GID:rsyncuser" >> /etc/group
+    RSYNC_USER=rsyncuser
+else
+    # UID and GID not provided
+    echo "UID and GID are NOT provided. Proceeding as the root user."
+    RSYNC_USER=root
+fi
+
 # Provide SSH_AUTH_KEY_* via environment variable
 for item in `env`; do
    case "$item" in
