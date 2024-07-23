@@ -10,6 +10,20 @@ chmod go-rwx /root/.ssh/authorized_keys
 sed -i "s/.*PasswordAuthentication .*/PasswordAuthentication no/g" /etc/ssh/sshd_config
 sed -i 's/root:!/root:*/' /etc/shadow
 
+if [ "$RSYNC_UID" != "" ] && [ "$RSYNC_GID" != "" ]; then
+    # UID and GID provided, create user
+    echo "UID and GID provided: $RSYNC_UID and $RSYNC_GID. Creating the user"
+    echo "rsyncuser:x:$RSYNC_UID:$RSYNC_GID::/home/rsyncuser:/bin/sh" >> /etc/passwd
+    echo "users:x:$RSYNC_GID:rsyncuser" >> /etc/group
+    RSYNC_USER=rsyncuser
+    RSYNC_GROUP=users
+else
+    # UID and GID not provided
+    echo "UID and GID are NOT provided. Proceeding as the root user."
+    RSYNC_USER=root
+    RSYNC_GROUP=root
+fi
+
 # Provide SSH_AUTH_KEY_* via environment variable
 for item in `env`; do
    case "$item" in
@@ -60,7 +74,7 @@ if [ "$1" == "server" ]; then
   echo "Running: /usr/sbin/sshd $SSH_PARAMS                                             "
   echo "================================================================================"
 
-  exec /usr/sbin/sshd -D $SSH_PARAMS
+  su-exec $RSYNC_USER:$RSYNC_GROUP  /usr/sbin/sshd -D $SSH_PARAMS
 fi
 
 echo "Please add this ssh key to your server /home/user/.ssh/authorized_keys        "
@@ -73,10 +87,10 @@ echo "==========================================================================
 ################################################################################
 
 if [ "$1" == "client" ]; then
-  exec /usr/sbin/crond -f
+  su-exec $RSYNC_USER:$RSYNC_GROUP  /usr/sbin/crond -f
 fi
 
 ################################################################################
 # Anything else
 ################################################################################
-exec "$@"
+su-exec $RSYNC_USER:$RSYNC_GROUP "$@"

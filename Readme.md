@@ -17,6 +17,15 @@ Get files from `remote server` to a `data container`:
 
 ## Advanced Usage
 
+### Change UID/GID
+
+if you want to execute rsync with another UID/GUID than root tou can use following environment variable
+
+- RSYNC_UID
+- RSYNC_GID
+
+docker run -it -e RSYNC_UID=1000001 -e RSYNC_GID=1000007 rsync /media/toto /media/tata
+
 ### Client setup
 
 Start client to pack and sync every night:
