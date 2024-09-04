@@ -28,20 +28,30 @@ Start client to pack and sync every night:
 
 Copy the client SSH public key printed found in console
 
-### SSH key persistence
+### SSH key persistence - client
 
-To use the same generated keys on docker container re-creation, you need to persist the key directory ( `/root/.ssh` ) in a Docker volume. On first start the keys will be created, and then, on all subsequent starts they will be re-used.
+To use the same generated keys on docker container re-creation, you need to persist the key directory ( `/root/.ssh` ) in a Docker volume. On first start the keys will be created, and then, on all subsequent starts they will be re-used. 
 
 For example, you can use a volume called `ssh-key` like this:
 
     $ docker run --name=rsync_client -v ssh-key:/root/.ssh -v client_vol_to_sync:/data
              eeacms/rsync client
 
+
+### SSH key persistence - server
+
+To use the same generated host keys on docker container re-creation, you need to persist the host key directory ( `/ssh_host_keys` ) in a Docker volume. On first start the keys will be created, and then, on all subsequent starts they will be re-used. 
+
+    $ docker run --name=rsync_server -v ssh-host-keys:/ssh_host_keys -v server_vol_to_sync:/data
+             eeacms/rsync server
+             
+If you want the rsync client to skip checking the ssh host keys, you can always add this 2 parameters to your client ssh configuration `-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no`
+
 ### Server setup
 
 Start server on `foo.bar.com`
 
-    # docker run --name=rsync_server -d -p 2222:22 -v server_vol_to_sync:/data \
+    # docker run --name=rsync_server -d -p 2222:22 -v ssh-host-keys:/ssh_host_keys -v server_vol_to_sync:/data \
                  -e SSH_AUTH_KEY_1="<SSH KEY FROM rsync_client>" \
                  -e SSH_AUTH_KEY_n="<SSH KEY FROM rsync_client_n>" \
              eeacms/rsync server
