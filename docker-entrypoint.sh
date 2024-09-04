@@ -32,10 +32,22 @@ for item in `env`; do
    esac
 done
 
-# Generate host SSH keys
-if [ ! -e /etc/ssh/ssh_host_rsa_key.pub ]; then
+
+if [ -e /ssh_host_keys/ssh_host_rsa_key.pub ] && [ -e /ssh_host_keys/ssh_host_rsa_key ]; then
+  # Copy persistent host keys
+  echo "Using existing SSH host keys"
+  cp /ssh_host_keys/* /etc/ssh/
+elif [ ! -e /etc/ssh/ssh_host_rsa_key.pub ]; then
+  # Generate host SSH keys
+  echo "Generating SSH host keys"
   ssh-keygen -A
+  if [ -d /ssh_host_keys ]; then
+    # Store generated keys on persistent volume
+    echo "Persisting SSH host keys in /ssh_host_keys"
+    cp -up /etc/ssh/ssh_host_* /ssh_host_keys/
+  fi
 fi
+
 
 # Generate root SSH key
 if [ ! -e /root/.ssh/id_rsa.pub ]; then
