@@ -19,7 +19,7 @@ Get files from `remote server` to a `data container`:
 
 ### Change UID/GID
 
-if you want to execute rsync with another UID/GUID than root tou can use following environment variable
+if you want to execute rsync with another UID/GUID than root you can use the following environment variables
 
 - RSYNC_UID
 - RSYNC_GID
