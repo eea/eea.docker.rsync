@@ -40,7 +40,7 @@ if [ -e /ssh_host_keys/ssh_host_rsa_key.pub ] && [ -e /ssh_host_keys/ssh_host_rs
 elif [ ! -e /etc/ssh/ssh_host_rsa_key.pub ]; then
   # Generate host SSH keys
   echo "Generating SSH host keys"
-  ssh-keygen -A
+  ssh-keygen -t rsa -b 4096 -A
   if [ -d /ssh_host_keys ]; then
     # Store generated keys on persistent volume
     echo "Persisting SSH host keys in /ssh_host_keys"
@@ -51,7 +51,7 @@ fi
 
 # Generate root SSH key
 if [ ! -e /root/.ssh/id_rsa.pub ]; then
-  ssh-keygen -q -N "" -f /root/.ssh/id_rsa
+  ssh-keygen -t rsa -b 4096 -q -N "" -f /root/.ssh/id_rsa
 fi
 
 ################################################################################
