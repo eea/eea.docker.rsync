@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.9 (2024-08-08)
+
+- OS Alpine version 3.22.1
+- Remove openssh fix
+
+
 ## 2.5 (2024-08-08)
 
 - OS Alpine version 3.20.2
