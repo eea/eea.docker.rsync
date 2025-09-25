@@ -14,8 +14,8 @@ sed -i 's/root:!/root:*/' /etc/shadow
 for item in `env`; do
    case "$item" in
        SSH_AUTH_KEY*)
-            ENVVAR=`echo $item | sed 's|ssh-|\nssh-|g' | cut -d \= -f 1`
-            printenv $ENVVAR >> /root/.ssh/authorized_keys
+            ENVVAR=`echo $item | cut -d \= -f 1`
+            printenv $ENVVAR | sed 's|ssh-|\nssh-|g' >> /root/.ssh/authorized_keys
             ;;
    esac
 done
