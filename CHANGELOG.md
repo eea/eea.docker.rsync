@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1 (2026-08-24)
+
+- OS Alpine version 3.24.1
+
 ## 2.9 (2024-08-08)
 
 - OS Alpine version 3.22.1
