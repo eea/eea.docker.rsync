@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.0 (2025-09-04)
+## 3.1 (2025-09-04)
 
 - OS Alpine version 3.24.1
 - Upgrade openssh to 10.5 ( fix )
