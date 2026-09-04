@@ -3,6 +3,7 @@
 ## 3.0 (2025-09-04)
 
 - OS Alpine version 3.24.1
+- Upgrade openssh to 10.5 ( fix )
   
 ## 2.9 (2024-08-08)
 

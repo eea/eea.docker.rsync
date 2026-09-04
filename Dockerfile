@@ -1,8 +1,13 @@
 FROM alpine:3.24.1
 LABEL maintainer="EEA: IDM2 A-Team <eea-edw-a-team-alerts@googlegroups.com>"
 
+#remove after upgrade on alpine >3.24.1
+#fix for CVE, openssh 10.5
+RUN apk add openssh --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main  \
+   && rm -rf /var/cache/apk/*
 
-RUN apk add --no-cache --virtual .run-deps openssh rsync tzdata curl ca-certificates \
+
+RUN apk add --no-cache --virtual .run-deps rsync tzdata curl ca-certificates \
   && rm -rf /var/cache/apk/*
 
 
